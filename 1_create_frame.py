@@ -16,35 +16,35 @@ Round = 0
 goal = 10
 gsx = screen_width / 2
 gsy = screen_height - 20
-cloud_img = pygame.image.load("/home/hcl/dohyung/python/Ptgame_basic/cloud.png")
+cloud_img = pygame.image.load("./cloud.png")
 cloudPosX = (int(random()* 400) + 0)
 cloudPosY = -50
 cloud_width = 120
 cloud_height = 100
 cloud_img = pygame.transform.scale(cloud_img, (cloud_width, cloud_height))
 
-aircraft_img = pygame.image.load("/home/hcl/dohyung/python/Ptgame_basic/aircraft.png")
+aircraft_img = pygame.image.load("./aircraft.png")
 aircraftPosX = 70
 aircraftPosY = 400
 aircraft_width = 100
 aircraft_height = 100
 aircraft_img = pygame.transform.scale(aircraft_img, (aircraft_width, aircraft_height))
 
-Text_img = pygame.image.load("/home/hcl/dohyung/python/Ptgame_basic/Text1.png")
+Text_img = pygame.image.load("./Text1.png")
 TextPosX = 30
 TextPosY = 20
 Text_width = 300
 Text_height = 60
 Text_img = pygame.transform.scale(Text_img, (Text_width, Text_height))
 
-cloud2_img = pygame.image.load("/home/hcl/dohyung/python/Ptgame_basic/__pycache__/airplane-1295845.png")
+cloud2_img = pygame.image.load("./airplane-1295845.png")
 cloud2PosX = 350
 cloud2PosY = -70
 cloud2_width = 50
 cloud2_height = 50
 cloud2_img = pygame.transform.scale(cloud2_img, (cloud2_width, cloud2_height))
 
-cloud2_img = pygame.image.load("/home/hcl/dohyung/python/Ptgame_basic/cloud.png")
+cloud2_img = pygame.image.load("./cloud.png")
 cloud2PosX = 30
 cloud2PosY = 0
 cloud2_width = 70
@@ -52,7 +52,7 @@ cloud2_height = 70
 cloud2_img = pygame.transform.scale(cloud2_img, (cloud2_width, cloud2_height))
 
 #Spitfire(스핏파이어 전투기)
-Spitfire_img = pygame.image.load("/home/hcl/dohyung/python/Ptgame_basic/pngwing.com.png")
+Spitfire_img = pygame.image.load("./pngwing.com.png")
 Spitfire_width = 70
 Spitfire_height = 70
 Spitfire_img = pygame.transform.scale(Spitfire_img, (Spitfire_width, Spitfire_height))
@@ -75,7 +75,7 @@ Hy = 460
 Hw = 200
 Hh = 35
 #BF109((독일)전투기)
-bf_img = pygame.image.load("/home/hcl/dohyung/python/Ptgame_basic/__pycache__/pngegg.png")
+bf_img = pygame.image.load("./pngegg.png")
 bf_width = 70
 bf_height = 70
 bf_img = pygame.transform.scale(bf_img, (bf_width, bf_height))

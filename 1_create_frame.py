@@ -12,7 +12,7 @@ screen = pygame.display.set_mode((screen_width,screen_height))
 SURFACE = pygame.display.set_mode((400,500))
 FPSCLOCK = pygame.time.Clock()
 #세부 내용
-Round = 0
+Round = 4
 goal = 10
 gsx = screen_width / 2
 gsy = screen_height - 20
@@ -65,6 +65,12 @@ bsV = 5
 bsw = 5
 bsh = 5
 #Abro Lancaster I(아브로 랭커스터 폭격기)
+Lancaster_img = pygame.image.load("./pngegg (1).png")
+LancasterPosX = 350
+LancasterPosY = -70
+Lancaster_width = 100
+Lancaster_height = 100
+Lancaster_img = pygame.transform.scale(Lancaster_img, (Lancaster_width, Lancaster_height))
 lx = 180
 ly = 210
 lw = 40
@@ -79,29 +85,46 @@ bf_img = pygame.image.load("./pngegg.png")
 bf_width = 70
 bf_height = 70
 bf_img = pygame.transform.scale(bf_img, (bf_width, bf_height))
+fw_img = pygame.image.load("./pngegg (3).png")
+fw_width = 70
+fw_height = 70
+fw_img = pygame.transform.scale(fw_img, (fw_width, fw_height))
+bs_img = pygame.image.load("./pngegg (3).png")
+bs_width = 80
+bs_height = 80
+bs_img = pygame.transform.scale(bs_img, (bs_width, bs_height))
 bx = 210
 by = 0
-bw = 15
-bh = 40
+bw = 70
+bh = 70
 bx2 = 210
 by2 = -200
-bw2= 15
-bh2 = 40
+bw2= 70
+bh2 = 70
 bx3 = 210
 by3 = -500
-bw3 = 15
-bh3 = 40
+bw3 = 70
+bh3 = 70
+bsx = 190
+bsy = 20
 bfLEFT = 1
 bfLEFTAD = 1
 bflist = []
 bfV = 7
-bfw = 5
-bfh = 5
+bfw = 10
+bfh = 10
+
+bf2LEFTAD = 1
+bf2list = []
+bf2V = 7
+bf2w = 10
+bf2h = 10
+bf2Tam = 0
 pygame.display.set_caption("Mission Spitfire")
 
 # FPS 설정
 clock = pygame.time.Clock()
-
+start_time = 0
 running = True
 while running:
     dt = clock.tick(100) # 프래임
@@ -133,29 +156,33 @@ while running:
             by2 = 0
             bx2 = (int(random()* 300) + 0)
 
-        if bfLEFTAD == 1 :
-            if bx3 > 10 :
-                bx3 -= (int(random() * 30) + 5)
-            bfLEFTAD -= 1
-        if bfLEFTAD == 0 :
-            if bx3 < 390 :
-                bx3 += (int(random() * 30) + 5)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
-            bfLEFTAD += 1
         if 500 < by3 :
             by3 = 0
             bx3 = (int(random()* 300) + 0)
 
-    if Round > 0: #적기 총 발사
-        bflist.append ([bx+29,by+20])
+        if 500 < by :
+            bys = 0
+            bxs = (int(random()* 300) + 0)
 
-    for i in range(len(bflist)):
+    if Round > 0: #적기 총 발사
+        if pygame.time.get_ticks() - start_time > 1000:
+            bflist.append ([bx+29,by+50])
+            start_time = pygame.time.get_ticks()
+                    
+    for i in range(len(bflist)): 
         bflist [i][1] += bfV
-    
-    #if 500 > bflist[0][1]: 이 부분에서 맵을 나가면 먼저 발사된 총알을 삭제해야 하기에 [i]가 아니라 처음 발사된 [0]
-    #으로 해야한다
+
     for i in range (len(bflist)):
         if 500 > bflist[0][1]:
             del bflist[0]
+
+                    
+    for i in range(len(bf2list)): 
+        bf2list [i][1] += bf2V
+
+    for i in range (len(bf2list)):
+        if 500 > bf2list[0][1]:
+            del bf2list[0]
 
         #구름이 만약 맵 밖으로 나갔다면...
         if 500 < cloudPosY :
@@ -176,19 +203,19 @@ while running:
     if keys[pygame.K_LEFT]: #왼쪽으로 이동
         if Round > 0:
             if px > 10:
-                px -= 3
+                px -= 6
             if lx > 10:
-                lx -= 2
+                lx -= 4
     elif keys[pygame.K_RIGHT]:#오른쪽으로 이동
         if Round > 0:
             if px < 390:
-                px += 3
+                px += 6
             if lx < 390:
-                lx += 2
+                lx += 4
     
     elif keys[pygame.K_DOWN]:#뒤로 이동
         if Round > 0:
-            py += 4
+            py += 6
     elif keys[pygame.K_UP]:#앞로 이동
         if Round > 0:
             if py > 30:
@@ -209,7 +236,7 @@ while running:
     #배경
     screen.fill((0,0,255))
     #랭커스터
-    pygame.draw.rect(SURFACE, (255,0,0),(lx,ly,lw,lh))
+    screen.blit(Lancaster_img, (lx,ly))
     #구름
     screen.blit(cloud_img, (cloudPosX,cloudPosY))
     screen.blit(cloud2_img, (cloud2PosX,cloud2PosY))
@@ -222,12 +249,15 @@ while running:
     if Round > 0:
         screen.blit(bf_img, (bx,by))
         for b in bflist:
-                bfRect = pygame.Rect(b[0]+5,b[1],bfw,bfh)
-                pygame.draw.rect(SURFACE, (255,0,0),bfRect, 0)
+            bfRect = pygame.Rect(b[0]+5,b[1],bfw,bfh)
+            pygame.draw.rect(SURFACE, (255,0,0),bfRect, 0)
     if Round > 1:
-        pygame.draw.rect(SURFACE, (0,255,255),(bx2,by2,bw2,bh2))
+        screen.blit(bf_img, (bx2,by2))
     if Round > 2:
-        pygame.draw.rect(SURFACE, (0,255,255),(bx3,by3,bw3,bh3))
+        screen.blit(fw_img, (bx3,by3))
+
+    if Round == 4:
+        screen.blit(bs_img, (bsx,bsy))
     #디테일
 
     screen.blit(aircraft_img, (aircraftPosX,aircraftPosY))
@@ -240,11 +270,13 @@ while running:
     if Round > 0:py-= 1
     if Round > 0:by+= 1
     if Round > 1:by2+= 1
-    if Round > 2:by3+= 1
+    if Round > 2:by3+= 1.5
     if Round > 0:cloudPosY += 0.4
     if Round > 0:cloud2PosY += 0.4
 
     if Round == 0:
         sleep(3.5)
         Round = 1
+    
+    FPSCLOCK.tick(80)
 pygame.quit()

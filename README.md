@@ -9,4 +9,4 @@ Let me know if you still have bugs over seconds.
 
 한 초등학생이 만들었습니다!
 
-버그가 계속 알려 주세요
+버그가 있으면 알려 주세요

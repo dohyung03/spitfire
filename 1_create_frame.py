@@ -115,13 +115,6 @@ bullet_speed = 2
 bfw = 10
 bfh = 10
 
-bf2LEFTAD = 1
-bf2list = []
-bf2V = 7
-bf2w = 10
-bf2h = 10
-bf2Tam = 0
-
 
 # 적기 왼쪽 위치 최소값, 적기 오른쪽 위치 최대값
 EPOSX = (10, 390) 
@@ -155,8 +148,8 @@ while running:
     for event in pygame.event.get(): 
         if event.type == pygame.QUIT:
             running = False
-            #BF109 좌우 이동
 
+    #BF109 좌우 이동
         # 시작위치및 이동
         for i in range(len(enemy_list)):
             # 방향이 결정되지 않았을때(0)만 주사위를 던져 방향을 정한다
@@ -177,7 +170,7 @@ while running:
             # 적기의 이동 속도만큼 더해준다
             elif enemy_list[i][1] == 1:
                 enemy_list[i][0][0] += enemy_speed[0]
-            
+
             # 만약 적기가 이동 방향에 대해 목적지에 이르렀다면,
             # 적기의 이동방향을 초기화해준다
             if abs(enemy_list[i][0][0] - rx) < 1:
@@ -190,7 +183,7 @@ while running:
                 enemy_list[i][0][1] = 0
                 enemy_list[i][0][0] = randint(0, 300)
 
-
+        print (goal)
     if Round > 0: #적기 총 발사
         for i in range(len(enemy_list)):
             if pygame.time.get_ticks() - enemy_list[i][3] > 1000:
@@ -244,11 +237,13 @@ while running:
     
     elif keys[pygame.K_DOWN]:#뒤로 이동
         if Round > 0:
-            py += 6
+            py += 4
+            ly += 4
     elif keys[pygame.K_UP]:#앞로 이동
         if Round > 0:
             if py > 30:
                 py -= 4
+                ly -= 4
 
 
     elif keys[pygame.K_SPACE]:#총 발사
@@ -269,15 +264,26 @@ while running:
     #구름
     screen.blit(cloud_img, (cloudPosX,cloudPosY))
     screen.blit(cloud2_img, (cloud2PosX,cloud2PosY))
+    screen.blit(cloud_img, (cloudPosX,cloudPosY))
+    screen.blit(cloud2_img, (cloud2PosX,cloud2PosY))
     #스핏파이어
     screen.blit(Spitfire_img, (px,py))
     for b in bslist:
         bRect = pygame.Rect(b[0]+5,b[1],bsw,bsh)
         pygame.draw.rect(SURFACE, (255,120,120),bRect, 0)
 
+        #for i in range(len(enemy_list)):
+        #    if enemy_speed[i][0][1] < bh:
+        #        if enemy_speed[i][0][1] > by:
+        #            if enemy_speed[i][0][0] < bw:
+        #                if enemy_speed[i][0][0] > bx:
+        #                    goal + 1
+        #                    enemy_speed[i][0][0] = randint(0,300)
+        #                    enemy_speed[i][0][1] = 0
+    
     #독일 전투기
     for enemy in enemy_list:
-        screen.blit(bs_img, enemy[0])
+        screen.blit(bf_img, enemy[0])
         for bullet in enemy[2]:
             bfRect = pygame.Rect(bullet[0]+5,bullet[1],bfw,bfh)
             pygame.draw.rect(SURFACE, (255,0,0),bfRect, 0)
@@ -297,6 +303,5 @@ while running:
     if Round == 0:
         sleep(3.5)
         Round = 1
-    
     FPSCLOCK.tick(80)
 pygame.quit()

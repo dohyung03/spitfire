@@ -107,10 +107,11 @@ bw3 = 70
 bh3 = 70
 bsx = 190
 bsy = 20
-bfLEFT = 1
-bfLEFTAD = 1
+
+enemy_dirAD = 1
 bflist = []
-bfV = 7
+bullet_speed = 2
+
 bfw = 10
 bfh = 10
 
@@ -120,11 +121,34 @@ bf2V = 7
 bf2w = 10
 bf2h = 10
 bf2Tam = 0
+
+
+# 적기 왼쪽 위치 최소값, 적기 오른쪽 위치 최대값
+EPOSX = (10, 390) 
+
+ep1 = [randint(EPOSX[0],EPOSX[1]), randint(-250, -50)]
+ep2 = [randint(EPOSX[0],EPOSX[1]), randint(-500, -250)]
+ep3 = [randint(EPOSX[0],EPOSX[1]), randint(-750, -500)]
+ep4 = [randint(EPOSX[0],EPOSX[1]), randint(-1000, -750)]
+bullets = []
+start_time = 0
+rx = 0
+enemy_speed = [1, 1]
+enemy_dir = 0
+enemy_list = [
+[ep1, enemy_dir, bullets, start_time, rx], 
+[ep2, enemy_dir, bullets, start_time, rx],
+[ep3, enemy_dir, bullets, start_time, rx],
+[ep4, enemy_dir, bullets, start_time, rx]
+]
+
+
+
 pygame.display.set_caption("Mission Spitfire")
 
 # FPS 설정
 clock = pygame.time.Clock()
-start_time = 0
+
 running = True
 while running:
     dt = clock.tick(100) # 프래임
@@ -132,70 +156,75 @@ while running:
         if event.type == pygame.QUIT:
             running = False
             #BF109 좌우 이동
-        if bfLEFT == 1 :
-            if bx > 10 :
-                bx -= (int(random() * 30) + 5)
-            bfLEFT -= 1
-        if bfLEFT == 0 :
-            if bx < 390 :
-                bx += (int(random() * 30) + 5)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
-            bfLEFT += 1
-        if 500 < by :
-            by = 0
-            bx = (int(random()* 300) + 0)
 
-        if bfLEFT == 1 :
-            if bx2 > 10 :
-                bx2 -= (int(random() * 30) + 5)
-            bfLEFT -= 1
-        if bfLEFT == 0 :
-            if bx2 < 390 :
-                bx2 += (int(random() * 30) + 5)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
-            bfLEFT += 1
-        if 500 < by2 :
-            by2 = 0
-            bx2 = (int(random()* 300) + 0)
+        # 시작위치및 이동
+        for i in range(len(enemy_list)):
+            # 방향이 결정되지 않았을때(0)만 주사위를 던져 방향을 정한다
+            if enemy_list[i][1] == 0:
+                # 최소 위치~최대 위치값 사이에 주사위를 던진다
+                rx = randint(EPOSX[0], EPOSX[1])
+                # 만약 주사위값이 현재 적기 위치보다 왼쪽이라면
+                # 방향을 왼쪽(-1)으로 설정해준다
+                if rx < enemy_list[i][0][0]:
+                    enemy_list[i][1] = -1
+                elif rx > enemy_list[i][0][0]:
+                    enemy_list[i][1] = 1
+            # 만약 갈 방향이 왼쪽이라면
+            # 적기의 이동 속도만큼 빼준다
+            if enemy_list[i][1] == -1:
+                enemy_list[i][0][0] -= enemy_speed[0]
+            # 만약 갈 방향이 오른쪽이라면
+            # 적기의 이동 속도만큼 더해준다
+            elif enemy_list[i][1] == 1:
+                enemy_list[i][0][0] += enemy_speed[0]
+            
+            # 만약 적기가 이동 방향에 대해 목적지에 이르렀다면,
+            # 적기의 이동방향을 초기화해준다
+            if abs(enemy_list[i][0][0] - rx) < 1:
+                enemy_list[i][1] = 0
 
-        if 500 < by3 :
-            by3 = 0
-            bx3 = (int(random()* 300) + 0)
 
-        if 500 < by :
-            bys = 0
-            bxs = (int(random()* 300) + 0)
+        # 적기 리스폰
+        for i in range(len(enemy_list)):
+            if 500 < enemy_list[i][0][1] :
+                enemy_list[i][0][1] = 0
+                enemy_list[i][0][0] = randint(0, 300)
+
 
     if Round > 0: #적기 총 발사
-        if pygame.time.get_ticks() - start_time > 1000:
-            bflist.append ([bx+29,by+50])
-            start_time = pygame.time.get_ticks()
-                    
-    for i in range(len(bflist)): 
-        bflist [i][1] += bfV
+        for i in range(len(enemy_list)):
+            if pygame.time.get_ticks() - enemy_list[i][3] > 1000:
+                enemy_list[i][2].append ([enemy_list[i][0][0]+29,enemy_list[i][0][1]+50])
+                enemy_list[i][3] = pygame.time.get_ticks()
 
-    for i in range (len(bflist)):
-        if 500 > bflist[0][1]:
-            del bflist[0]
+    # 각 적기의 움직임 
+    for i in range(len(enemy_list)):
+        enemy_list[i][0][1] += enemy_speed[1]
 
-                    
-    for i in range(len(bf2list)): 
-        bf2list [i][1] += bf2V
+    # 각 적기에 대하여 총알 움직임 
+    for i in range(len(enemy_list)):
+        for j in range(len(enemy_list[i][2])):
+            enemy_list[i][2][j][1] += bullet_speed
 
-    for i in range (len(bf2list)):
-        if 500 > bf2list[0][1]:
-            del bf2list[0]
+    # 각 적기에 대하여 화면 넘어간 총알 리스트에서 제거
+    for i in range(len(enemy_list)):
+        for j in range(len(enemy_list[i][2])):
+            if 500 > enemy_list[i][2][0][1]:
+                del enemy_list[i][2][0]
+
 
         #구름이 만약 맵 밖으로 나갔다면...
         if 500 < cloudPosY :
             cloudPosY = 0
-            cloudPosX = (int(random()* 400) + 0)
-            cloud_height = (int(random()* 200) + 80)
-            cloud_width = (int(random()* 210) + 90)
+            cloudPosX = randint(0,400)
+            cloud_height = randint(80,280)
+            cloud_width = randint(90,300)
 
         if 500 < cloud2PosY :
             cloud2PosY = 0
-            cloud2PosX = (int(random()* 400) + 0)
-            cloud2_height = (int(random()* 200) + 80)
-            cloud2_width = (int(random()* 210) + 90)
+            cloud2PosX = randint(0,400)
+            cloud2_height = randint(80,280)
+            cloud2_width = randint(90,300)
 
     # 키보드를 누르고 있는지를 알려주는 함수
     keys = pygame.key.get_pressed()
@@ -245,21 +274,15 @@ while running:
     for b in bslist:
         bRect = pygame.Rect(b[0]+5,b[1],bsw,bsh)
         pygame.draw.rect(SURFACE, (255,120,120),bRect, 0)
+
     #독일 전투기
-    if Round > 0:
-        screen.blit(bf_img, (bx,by))
-        for b in bflist:
-            bfRect = pygame.Rect(b[0]+5,b[1],bfw,bfh)
+    for enemy in enemy_list:
+        screen.blit(bs_img, enemy[0])
+        for bullet in enemy[2]:
+            bfRect = pygame.Rect(bullet[0]+5,bullet[1],bfw,bfh)
             pygame.draw.rect(SURFACE, (255,0,0),bfRect, 0)
-    if Round > 1:
-        screen.blit(bf_img, (bx2,by2))
-    if Round > 2:
-        screen.blit(fw_img, (bx3,by3))
-
-    if Round == 4:
-        screen.blit(bs_img, (bsx,bsy))
+    
     #디테일
-
     screen.blit(aircraft_img, (aircraftPosX,aircraftPosY))
     pygame.draw.rect(SURFACE, (0,0,0),(0,410,80,80))
     pygame.draw.rect(SURFACE, (0,255,0),(Hx,Hy,Hw,Hh))
@@ -267,10 +290,7 @@ while running:
     if Round == 0: screen.blit(Text_img, (TextPosX,TextPosY))
     if Round == 0: screen.blit(cloud_img, (cloudPosX,cloudPosY))
     pygame.display.update()
-    if Round > 0:py-= 1
-    if Round > 0:by+= 1
-    if Round > 1:by2+= 1
-    if Round > 2:by3+= 1.5
+
     if Round > 0:cloudPosY += 0.4
     if Round > 0:cloud2PosY += 0.4
 

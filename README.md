@@ -10,3 +10,6 @@ Let me know if you still have bugs over seconds.
 한 초등학생이 만들었습니다!
 
 버그가 있으면 알려 주세요
+
+
+아직 작업중에 있습니다 완벽하지는 않아요!

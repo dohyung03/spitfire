@@ -2,8 +2,22 @@ import pygame
 import sys
 from time import sleep
 from random import *
+from pygame import Rect
+
+# 충돌 감지 함수 정의
+# 입력 매개변수로 Rect형 변수 두개를 넣는다
+def collide(rect1, rect2):
+    # x축에서 충돌을 감지했다면
+    if (rect1.right >= rect2.left and rect1.left <= rect2.right) \
+        or (rect2.right >= rect1.left and rect2.left <= rect1.right):
+        if (rect1.bottom >= rect2.top and rect1.top <= rect2.bottom) \
+            or (rect2.bottom >= rect1.top and rect2.top <= rect1.bottom):
+            return True
+    return False
+
 
 pygame.init() # 초기화 시키기
+
 
 screen_width = 600
 screen_height = 450
@@ -53,13 +67,11 @@ cloud2_img = pygame.transform.scale(cloud2_img, (cloud2_width, cloud2_height))
 
 #Spitfire(스핏파이어 전투기)
 Spitfire_img = pygame.image.load("./pngwing.com.png")
-Spitfire_width = 70
-Spitfire_height = 70
-Spitfire_img = pygame.transform.scale(Spitfire_img, (Spitfire_width, Spitfire_height))
-px = 180
-py = 180
-pw = 15
-ph = 50
+spitfire_width = 70
+spitfire_height = 70
+Spitfire_img = pygame.transform.scale(Spitfire_img, (spitfire_width, spitfire_height))
+spitfire_pos_x = 180
+spitfire_pos_y = 180
 bslist = []
 bsV = 5
 bsw = 5
@@ -81,10 +93,10 @@ Hy = 460
 Hw = 200
 Hh = 35
 #BF109((독일)전투기)
-bf_img = pygame.image.load("./pngegg.png")
-bf_width = 70
-bf_height = 70
-bf_img = pygame.transform.scale(bf_img, (bf_width, bf_height))
+enemy_img = pygame.image.load("./pngegg.png")
+enemy_width = 70
+enemy_height = 70
+enemy_img = pygame.transform.scale(enemy_img, (enemy_width, enemy_height))
 fw_img = pygame.image.load("./pngegg (3).png")
 fw_width = 70
 fw_height = 70
@@ -97,6 +109,7 @@ bx = 210
 by = 0
 bw = 70
 bh = 70
+
 bx2 = 210
 by2 = -200
 bw2= 70
@@ -107,7 +120,6 @@ bw3 = 70
 bh3 = 70
 bsx = 190
 bsy = 20
-
 enemy_dirAD = 1
 bflist = []
 bullet_speed = 2
@@ -138,6 +150,7 @@ enemy_list = [
 
 
 pygame.display.set_caption("Mission Spitfire")
+#변수 이후...
 
 # FPS 설정
 clock = pygame.time.Clock()
@@ -148,7 +161,6 @@ while running:
     for event in pygame.event.get(): 
         if event.type == pygame.QUIT:
             running = False
-
     #BF109 좌우 이동
         # 시작위치및 이동
         for i in range(len(enemy_list)):
@@ -156,6 +168,8 @@ while running:
             if enemy_list[i][1] == 0:
                 # 최소 위치~최대 위치값 사이에 주사위를 던진다
                 rx = randint(EPOSX[0], EPOSX[1])
+                #만약 내 전투기가 적기랑 충돌했다면
+                
                 # 만약 주사위값이 현재 적기 위치보다 왼쪽이라면
                 # 방향을 왼쪽(-1)으로 설정해준다
                 if rx < enemy_list[i][0][0]:
@@ -171,6 +185,13 @@ while running:
             elif enemy_list[i][1] == 1:
                 enemy_list[i][0][0] += enemy_speed[0]
 
+            spitfireRect = Rect(spitfire_pos_x, spitfire_pos_y, spitfire_width, spitfire_height)
+            enemyRect = Rect(enemy_list[i][0][0], enemy_list[i][0][1], enemy_width, enemy_height) 
+            print(spitfireRect, enemyRect)
+            if collide(spitfireRect, enemyRect):
+                running = False
+
+
             # 만약 적기가 이동 방향에 대해 목적지에 이르렀다면,
             # 적기의 이동방향을 초기화해준다
             if abs(enemy_list[i][0][0] - rx) < 1:
@@ -182,8 +203,6 @@ while running:
             if 500 < enemy_list[i][0][1] :
                 enemy_list[i][0][1] = 0
                 enemy_list[i][0][0] = randint(0, 300)
-
-        print (goal)
     if Round > 0: #적기 총 발사
         for i in range(len(enemy_list)):
             if pygame.time.get_ticks() - enemy_list[i][3] > 1000:
@@ -205,7 +224,6 @@ while running:
             if 500 > enemy_list[i][2][0][1]:
                 del enemy_list[i][2][0]
 
-
         #구름이 만약 맵 밖으로 나갔다면...
         if 500 < cloudPosY :
             cloudPosY = 0
@@ -224,30 +242,30 @@ while running:
     #랭커스터,스핏파이어 관련 키보드 이벤트
     if keys[pygame.K_LEFT]: #왼쪽으로 이동
         if Round > 0:
-            if px > 10:
-                px -= 6
+            if spitfire_pos_x > 10:
+                spitfire_pos_x -= 6
             if lx > 10:
                 lx -= 4
     elif keys[pygame.K_RIGHT]:#오른쪽으로 이동
         if Round > 0:
-            if px < 390:
-                px += 6
+            if spitfire_pos_x < 390:
+                spitfire_pos_x += 6
             if lx < 390:
                 lx += 4
     
     elif keys[pygame.K_DOWN]:#뒤로 이동
         if Round > 0:
-            py += 4
+            spitfire_pos_y += 4
             ly += 4
     elif keys[pygame.K_UP]:#앞로 이동
         if Round > 0:
-            if py > 30:
-                py -= 4
+            if spitfire_pos_y > 30:
+                spitfire_pos_y -= 4
                 ly -= 4
 
 
     elif keys[pygame.K_SPACE]:#총 발사
-        bslist.append ([px+29,py])
+        bslist.append ([spitfire_pos_x+29,spitfire_pos_y])
 
     for i in range(len(bslist)):
         bslist [i][1] -= bsV
@@ -267,27 +285,19 @@ while running:
     screen.blit(cloud_img, (cloudPosX,cloudPosY))
     screen.blit(cloud2_img, (cloud2PosX,cloud2PosY))
     #스핏파이어
-    screen.blit(Spitfire_img, (px,py))
+    screen.blit(Spitfire_img, (spitfire_pos_x,spitfire_pos_y))
     for b in bslist:
         bRect = pygame.Rect(b[0]+5,b[1],bsw,bsh)
         pygame.draw.rect(SURFACE, (255,120,120),bRect, 0)
-
-        #for i in range(len(enemy_list)):
-        #    if enemy_speed[i][0][1] < bh:
-        #        if enemy_speed[i][0][1] > by:
-        #            if enemy_speed[i][0][0] < bw:
-        #                if enemy_speed[i][0][0] > bx:
-        #                    goal + 1
-        #                    enemy_speed[i][0][0] = randint(0,300)
-        #                    enemy_speed[i][0][1] = 0
+        
     
     #독일 전투기
     for enemy in enemy_list:
-        screen.blit(bf_img, enemy[0])
+        screen.blit(enemy_img, enemy[0])
         for bullet in enemy[2]:
             bfRect = pygame.Rect(bullet[0]+5,bullet[1],bfw,bfh)
             pygame.draw.rect(SURFACE, (255,0,0),bfRect, 0)
-    
+        
     #디테일
     screen.blit(aircraft_img, (aircraftPosX,aircraftPosY))
     pygame.draw.rect(SURFACE, (0,0,0),(0,410,80,80))
